@@ -10,9 +10,29 @@ const PopupWithForm = ({
   onSubmit,
   buttonDisabled,
 }) => {
+  const handleClickContainer = (event) => {
+    event.stopPropagation();
+  };
+
+  const handleCloseOnEscape = (event) => {
+    if (event.key === "Escape") {
+      onClose();
+    }
+  };
+
+  React.useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("keydown", handleCloseOnEscape);
+    }
+    return () => document.removeEventListener("keydown", handleCloseOnEscape);
+  }, [isOpen]);
+
   return (
-    <div className={`popup popup_${name} ${isOpen ? "popup_opened" : ""}`}>
-      <div className="popup__container">
+    <div
+      onMouseDown={onClose}
+      className={`popup popup_${name} ${isOpen ? "popup_opened" : ""}`}
+    >
+      <div onMouseDown={handleClickContainer} className="popup__container">
         <button onClick={onClose} className="popup__close" type="button" />
         <h2 className="popup__title">{title}</h2>
         <form

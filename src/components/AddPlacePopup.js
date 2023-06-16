@@ -13,11 +13,11 @@ const AddPlacePopup = ({ isOpen, onClose, onAddPlace, isLoading }) => {
   };
 
   useEffect(() => {
-    if(isOpen) {
-    setName('') 
-    setLink('')
+    if (isOpen) {
+      setName("");
+      setLink("");
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   return (
     <PopupWithForm

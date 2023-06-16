@@ -1,13 +1,20 @@
 import successIcon from "../assets/images/auth/successIcon.svg";
-import unsuccessIcon from "../assets/images/auth/unsuccessIcon.svg";
+import failIcon from "../assets/images/auth/failIcon.svg";
 
 const InfoTooltip = ({ isOpen, onClose, isSuccess }) => {
+  const handleClickContainer = (event) => {
+    event.stopPropagation();
+  };
+
   return (
-    <div className={`popup ${isOpen ? "popup_opened" : ""}`}>
-      <div className="popup__container">
+    <div
+      onMouseDown={onClose}
+      className={`popup ${isOpen ? "popup_opened" : ""}`}
+    >
+      <div onMouseDown={handleClickContainer} className="popup__container">
         <button type="button" className="popup__close" onClick={onClose} />
         <img
-          src={isSuccess ? successIcon : unsuccessIcon}
+          src={isSuccess ? successIcon : failIcon}
           alt={
             isSuccess ? "Регистрация прошла успешно" : "Регистрация не прошла"
           }

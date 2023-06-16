@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const AuthForm = ({ title, buttonText, onSubmit }) => {
   const [values, setValues] = useState({ email: "", password: "" });
 
@@ -6,10 +8,15 @@ const AuthForm = ({ title, buttonText, onSubmit }) => {
     setValues({ ...values, [name]: value });
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSubmit(values);
+  };
+
   return (
     <div className="auth">
       <h2 className="auth__title">{title}</h2>
-      <form className="form auth__form" onSubmit={onSubmit} noValidate>
+      <form className="form auth__form" onSubmit={handleSubmit} noValidate>
         <input
           type="email"
           placeholder="Email"
@@ -32,8 +39,9 @@ const AuthForm = ({ title, buttonText, onSubmit }) => {
         />
 
         <button type="submit">{buttonText}</button>
-        <span className="auth__login-hint"></span>
       </form>
     </div>
   );
 };
+
+export default AuthForm;

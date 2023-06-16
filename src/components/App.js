@@ -11,7 +11,10 @@ import api from "../utils/api";
 import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import apiAuth from "../utils/apiAuth";
+import InfoTooltip from "./InfoTooltip";
+import ProtectedRoute from "./ProtectedRoute";
 
 const App = () => {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
@@ -22,7 +25,16 @@ const App = () => {
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const [isToolTipOpen, setisToolTipOpen] = React.useState(false);
+  const [isSuccess, setisSuccess] = React.useState(false);
+  const [hasToken, setHasToken] = React.useState(
+    Boolean(localStorage.getItem("JWT"))
+  );
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [userData, setUserData] = React.useState({});
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -46,6 +58,7 @@ const App = () => {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setisToolTipOpen(false);
     setSelectedCard({});
   };
   const handleClickCard = ({ name, link }) => {
@@ -130,29 +143,90 @@ const App = () => {
       .catch(console.log);
   }
 
-  const handleLogin = () => {};
-  const handleRegistration = () => {};
+  React.useEffect(() => {
+    if (hasToken) {
+      apiAuth
+        .checkAuth()
+        .then(({ data }) => {
+          setUserData(data);
+          setIsLoggedIn(true);
+          navigate("/");
+        })
+        .catch(console.log)
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [hasToken]);
+
+  const handleLogin = ({ email, password }) => {
+    apiAuth
+      .login({ email, password })
+      .then(({ token }) => {
+        localStorage.setItem("JWT", token);
+        setHasToken(true);
+      })
+      .catch(() => {
+        setisSuccess(false);
+        setisToolTipOpen(true);
+      });
+  };
+
+  const handleRegistration = ({ email, password }) => {
+    apiAuth
+      .register({ email, password })
+      .then(() => {
+        setisSuccess(true);
+        setisToolTipOpen(true);
+        navigate("/sign-in");
+      })
+      .catch(() => {
+        setisSuccess(false);
+        setisToolTipOpen(true);
+      });
+  };
+
+  const handleLogout = () => {
+    setHasToken(false);
+    setIsLoggedIn(false);
+    setUserData({});
+    localStorage.removeItem("JWT");
+  };
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <Header />
+      <Header
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
+        email={userData.email}
+      />
+
       <Routes>
         <Route
           path="/"
           element={
-            <Main
-              onAddPlace={openAddPlaceClick}
-              onEditAvatar={openEditAvatarClick}
-              onEditProfile={openEditProfileClick}
-              onCardClick={handleClickCard}
-              onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
-              cards={cards}
+            <ProtectedRoute
+              isLoading={isLoading}
+              isLoggedIn={isLoggedIn}
+              element={
+                <Main
+                  onAddPlace={openAddPlaceClick}
+                  onEditAvatar={openEditAvatarClick}
+                  onEditProfile={openEditProfileClick}
+                  onCardClick={handleClickCard}
+                  onCardLike={handleCardLike}
+                  onCardDelete={handleCardDelete}
+                  cards={cards}
+                />
+              }
             />
           }
         />
         <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
-        <Route path="/sign-up" element={<Register onRegister={handleRegistration} />} />
+        <Route
+          path="/sign-up"
+          element={<Register onRegister={handleRegistration} />}
+        />
       </Routes>
 
       <Footer />
@@ -178,12 +252,13 @@ const App = () => {
         isLoading={isLoading}
       />
 
-      <PopupWithForm
-        title={"Вы уверены?"}
-        name={"delete-form"}
-        buttonText={"Да"}
-      />
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+
+      <InfoTooltip
+        isOpen={isToolTipOpen}
+        onClose={closeAllPopups}
+        isSuccess={isSuccess}
+      />
     </CurrentUserContext.Provider>
   );
 };

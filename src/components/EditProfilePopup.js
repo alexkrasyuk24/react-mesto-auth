@@ -23,11 +23,11 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isLoading }) => {
   }, [currentUser]);
 
   useEffect(() => {
-    if(isOpen) {
-    setName('') 
-    setDescription('')
+    if (isOpen) {
+      setName("");
+      setDescription("");
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   return (
     <PopupWithForm
