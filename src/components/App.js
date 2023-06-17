@@ -2,7 +2,6 @@ import React from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
-import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
@@ -11,7 +10,7 @@ import api from "../utils/api";
 import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import apiAuth from "../utils/apiAuth";
 import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
@@ -156,6 +155,8 @@ const App = () => {
         .finally(() => {
           setIsLoading(false);
         });
+    } else {
+      setIsLoading(false)
     }
   }, [hasToken]);
 
@@ -227,6 +228,7 @@ const App = () => {
           path="/sign-up"
           element={<Register onRegister={handleRegistration} />}
         />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <Footer />

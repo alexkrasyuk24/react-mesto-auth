@@ -20,14 +20,14 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isLoading }) => {
   React.useEffect(() => {
     setName(currentUser.name);
     setDescription(currentUser.about);
-  }, [currentUser]);
+  }, [currentUser, isOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setName("");
-      setDescription("");
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     setName("");
+  //     setDescription("");
+  //   }
+  // }, [isOpen]);
 
   return (
     <PopupWithForm
