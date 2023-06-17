@@ -22,13 +22,6 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isLoading }) => {
     setDescription(currentUser.about);
   }, [currentUser, isOpen]);
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     setName("");
-  //     setDescription("");
-  //   }
-  // }, [isOpen]);
-
   return (
     <PopupWithForm
       title={"Редактировать профиль"}
